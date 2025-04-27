@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">SQL Server App</string>
+    <string name="fetch_button_text">عرض الجداول</string>
+</resources>
