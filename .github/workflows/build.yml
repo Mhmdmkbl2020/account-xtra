@@ -1,0 +1,51 @@
+name: Build Android App
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build Android App
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Setup Mono
+      uses: monodotnet/setup@v1
+      with:
+        mono-version: 'latest'
+
+    - name: Install .NET SDK
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '6.0.x'
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y openjdk-11-jdk
+        sudo apt-get install -y apt-transport-https
+        sudo apt-get install -y lib32z1 lib32stdc++6
+
+    - name: Build Project
+      run: |
+        msbuild DirectSQLConnectionApp.sln /t:Restore
+        msbuild DirectSQLConnectionApp.sln /p:Configuration=Release
+
+    - name: Archive APK
+      run: |
+        mkdir -p build-output
+        cp **/*.apk build-output/
+      # رفع الـ APK إلى الـ Artifacts
+    - name: Upload APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: app-apk
+        path: build-output/*.apk
